@@ -11,14 +11,43 @@ class PriceScreen extends StatefulWidget {
 }
 
 class _PriceScreenState extends State<PriceScreen> {
+  String SelectedCurrency = "USD";
+  String BTC = "error";
+  String ETH = "error";
+  String LTC = "error";
+
+
+
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    fetchdata();
+    fetchdata(SelectedCurrency);
   }
-  String SelectedCurrency = "USD";
-  int rate =0;
+
+
+
+
+  void fetchdata(String SelectedCurrency)async{
+    Response response = await get(Uri.parse("https://rest.coinapi.io/v1/exchangerate/$SelectedCurrency?apikey=F01AC99C-84BF-44FF-9227-6493587AFEEE"));
+    if( response.statusCode==200){
+      var result = jsonDecode(response.body);
+      setState(() {
+        double btc = result['rates'][453]['rate'];
+        BTC = btc.toStringAsFixed(2);
+
+         double eth = result['rates'][911]['rate'];
+         ETH = eth.toStringAsFixed(2);
+
+
+         double ltc = result['rates'][1551]['rate'];
+         LTC = ltc.toStringAsFixed(2);
+      });
+    }
+  }
+
+
 
 
 
@@ -30,22 +59,9 @@ class _PriceScreenState extends State<PriceScreen> {
         DropdownMenuItem(child: Text(currency),value: currency,),
       );
     }
-
     return dropDownMenu;
   }
 
-  void fetchdata()async{
-    Response response = await get(Uri.parse("https://rest.coinapi.io/v1/exchangerate/BTC/USD?apikey=F01AC99C-84BF-44FF-9227-6493587AFEEE"));
-    if( response.statusCode==200){
-      var result = jsonDecode(response.body);
-      setState(() {
-        double rt = result['rate'];
-        rate = rt.toInt();
-      });
-
-
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -71,7 +87,7 @@ class _PriceScreenState extends State<PriceScreen> {
                   child:  Padding(
                     padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
                     child: Text(
-                      '1 BTC = $rate $SelectedCurrency',
+                      '1 BTC = $BTC $SelectedCurrency',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 20.0,
@@ -92,10 +108,10 @@ class _PriceScreenState extends State<PriceScreen> {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10.0),
                   ),
-                  child: const Padding(
+                  child:  Padding(
                     padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
                     child: Text(
-                      '1 BTC = ? USD',
+                      '1 ETH = $ETH $SelectedCurrency',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 20.0,
@@ -116,10 +132,10 @@ class _PriceScreenState extends State<PriceScreen> {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10.0),
                   ),
-                  child: const Padding(
+                  child:  Padding(
                     padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
                     child: Text(
-                      '1 BTC = ? USD',
+                      '1 LTC = $LTC $SelectedCurrency',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 20.0,
@@ -146,6 +162,7 @@ class _PriceScreenState extends State<PriceScreen> {
                 setState(() {
                   SelectedCurrency = "$value";
                 });
+                fetchdata(SelectedCurrency);
 
               },
 
